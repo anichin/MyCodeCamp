@@ -4,6 +4,9 @@ using MyCodeCamp.Data;
 using MyCodeCamp.Data.Entities;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
+using MyCodeCamp.Models;
+using System.Collections.Generic;
 
 namespace MyCodeCamp.Controllers
 {
@@ -12,11 +15,16 @@ namespace MyCodeCamp.Controllers
     {
         private ILogger<CampsController> _logger;
         private ICampRepository _repo;
+        private IMapper _mapper;
 
-        public CampsController(ICampRepository repo, ILogger<CampsController> logger)
+        public CampsController(
+            ICampRepository repo
+            , ILogger<CampsController> logger
+            ,IMapper mapper)
         {
             _repo = repo;
             _logger = logger;
+            _mapper = mapper;
         }
 
         [HttpGet("")]
@@ -24,7 +32,7 @@ namespace MyCodeCamp.Controllers
         {
             var camps = _repo.GetAllCamps();
 
-            return Ok(camps);
+            return Ok(_mapper.Map<IEnumerable<CampModel>>(camps));
         }
 
         [HttpGet("{id}", Name = "CampGet")]
@@ -39,7 +47,7 @@ namespace MyCodeCamp.Controllers
 
                 if (camp == null) return NotFound($"Camp {id} was not found");
 
-                return Ok(camp);
+                return Ok(_mapper.Map<CampModel>(camp));
             }
             catch
             {
