@@ -72,5 +72,66 @@ namespace MyCodeCamp.Controllers
             return BadRequest();
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] Camp model)
+        {
+            try
+            {
+                _logger.LogInformation("Updating an existing Code Camp");
+
+                var oldCamp = _repo.GetCamp(id);
+                if (oldCamp == null)
+                {
+
+                    return NotFound($"Could not find a camp with in ID of {id}");
+                }
+
+                // Map
+                oldCamp.Name = model.Name ?? oldCamp.Name;
+                oldCamp.Description = model.Description ?? oldCamp.Description;
+                oldCamp.Moniker = model.Moniker ?? oldCamp.Moniker;
+                oldCamp.Location = model.Location ?? oldCamp.Location;
+                oldCamp.Length = model.Length > 0 ? model.Length : oldCamp.Length;
+                oldCamp.EventDate = model.EventDate != DateTime.MinValue ? model.EventDate : oldCamp.EventDate;
+
+                if (await _repo.SaveAllAsync())
+                {
+                    return Ok(oldCamp);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Threw exception while updating Camp: {ex}");
+            }
+
+            return BadRequest("Couldn't update Camp");
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                _logger.LogInformation("Deleting a Camp");
+
+                var oldCamp = _repo.GetCamp(id);
+                if (oldCamp == null)
+                {
+                    return NotFound($"Could not find Camp with ID of {id}");
+                }
+
+                _repo.Delete(oldCamp);
+                if (await _repo.SaveAllAsync())
+                {
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Threw exception while deleting Camp: {ex}");
+            }
+
+            return BadRequest("Could not delete Camp");
+        }
     }
 }
