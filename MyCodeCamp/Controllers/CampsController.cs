@@ -11,7 +11,7 @@ using System.Collections.Generic;
 namespace MyCodeCamp.Controllers
 {
     [Route("api/[controller]")]
-    public class CampsController : Controller
+    public class CampsController : BaseController
     {
         private ILogger<CampsController> _logger;
         private ICampRepository _repo;

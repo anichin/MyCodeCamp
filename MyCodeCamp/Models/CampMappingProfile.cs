@@ -11,7 +11,10 @@ namespace MyCodeCamp.Models
                 .ForMember(c => c.StartDate,
                     opt => opt.MapFrom(camp => camp.EventDate))
                 .ForMember(c => c.EndDate,
-                    opt => opt.ResolveUsing(camp => camp.EventDate.AddDays(camp.Length > 0 ? camp.Length - 1 : 0)));
+                    opt => opt.ResolveUsing(camp => camp.EventDate.AddDays(camp.Length > 0 ? camp.Length - 1 : 0)))
+                .ForMember(c => c.Url,
+                    opt => opt.ResolveUsing<CampUrlResolver>());
+
         }
     }
 }
