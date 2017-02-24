@@ -84,5 +84,53 @@ namespace MyCodeCamp.Controllers
 
             return BadRequest("Could not add new speaker");
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(string moniker, int id, [FromBody] SpeakerModel model)
+        {
+            try
+            {
+                var speaker = _repository.GetSpeaker(id);
+                if (speaker == null) return NotFound();
+                if (speaker.Camp.Moniker != moniker) return BadRequest("Speaker and Camp do not match");
+
+                _mapper.Map(model, speaker);
+
+                if (await _repository.SaveAllAsync())
+                {
+                    return Ok(_mapper.Map<SpeakerModel>(speaker));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Exception thrown while updating speaker: {ex}");
+            }
+
+            return BadRequest("Could not update speaker");
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string moniker, int id)
+        {
+            try
+            {
+                var speaker = _repository.GetSpeaker(id);
+                if (speaker == null) return NotFound();
+                if (speaker.Camp.Moniker != moniker) return BadRequest("Speaker and Camp do not match");
+
+                _repository.Delete(speaker);
+
+                if (await _repository.SaveAllAsync())
+                {
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Exception thrown while deleting speaker: {ex}");
+            }
+            return BadRequest("Could not delete speaker");
+        }
+
     }
 }

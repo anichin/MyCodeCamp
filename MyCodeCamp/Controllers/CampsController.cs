@@ -74,15 +74,16 @@ namespace MyCodeCamp.Controllers
                     return Created(newUri, _mapper.Map<CampModel>(camp));
                 }else
                 {
-                    _logger.LogWarning("Could not save Camp to the database");
+                    var msg = "Could not save Camp to the database";
+                    _logger.LogError(msg);
+                    return StatusCode(500, msg);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Threw exception while saving Camp: {ex}");
+                return StatusCode(500, ex.Message);
             }
-
-            return BadRequest();
         }
 
         [HttpPut("{moniker}")]
