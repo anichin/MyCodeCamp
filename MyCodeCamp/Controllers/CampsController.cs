@@ -7,10 +7,12 @@ using Microsoft.Extensions.Logging;
 using AutoMapper;
 using MyCodeCamp.Models;
 using System.Collections.Generic;
+using MyCodeCamp.Filters;
 
 namespace MyCodeCamp.Controllers
 {
     [Route("api/[controller]")]
+    [ValidateModel]
     public class CampsController : BaseController
     {
         private ILogger<CampsController> _logger;
@@ -63,11 +65,6 @@ namespace MyCodeCamp.Controllers
             {
                 _logger.LogInformation("Creating a new Code Camp");
 
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 var camp = _mapper.Map<Camp>(model);
 
                 _repo.Add(camp);
@@ -94,11 +91,6 @@ namespace MyCodeCamp.Controllers
             try
             {
                 _logger.LogInformation("Updating an existing Code Camp");
-
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
 
                 var oldCamp = _repo.GetCampByMoniker(moniker);
                 if (oldCamp == null)

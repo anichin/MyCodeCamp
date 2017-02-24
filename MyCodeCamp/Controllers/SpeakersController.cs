@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyCodeCamp.Data;
 using MyCodeCamp.Data.Entities;
+using MyCodeCamp.Filters;
 using MyCodeCamp.Models;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
@@ -13,6 +14,7 @@ using MyCodeCamp.Models;
 namespace MyCodeCamp.Controllers
 {
     [Route("api/camps/{moniker}/speakers")]
+    [ValidateModel]
     public class SpeakersController : BaseController
     {
         private ICampRepository _repository;
