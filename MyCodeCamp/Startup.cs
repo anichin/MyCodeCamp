@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -20,10 +21,12 @@ namespace MyCodeCamp
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
 
+            _env = env;
             _config = builder.Build();
         }
 
         IConfigurationRoot _config;
+        private IHostingEnvironment _env;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -37,8 +40,33 @@ namespace MyCodeCamp
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddAutoMapper();
 
+            services.AddCors(cfg =>
+            {
+                cfg.AddPolicy("Wildermuth", bldr =>
+                {
+                    bldr.AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .WithOrigins("http://wildermuth.com");
+                });
+
+                cfg.AddPolicy("AnyGET", bldr =>
+                {
+                    bldr.AllowAnyHeader()
+                        .WithHeaders("GET")
+                        .AllowAnyOrigin();
+                });
+            });
+
             // Add framework services.
-            services.AddMvc()
+            services.AddMvc(opt =>
+            {
+                if (!_env.IsProduction())
+                {
+                    opt.SslPort = 44388;
+                }
+                opt.Filters.Add(new RequireHttpsAttribute());
+            }
+            )
               .AddJsonOptions(opt =>
               {
                   opt.SerializerSettings.ReferenceLoopHandling =
@@ -54,6 +82,13 @@ namespace MyCodeCamp
         {
             loggerFactory.AddConsole(_config.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            //app.UseCors(cfg =>
+            //{
+            //    cfg.AllowAnyHeader()
+            //        .AllowAnyMethod()
+            //        .WithOrigins("http://wildermuth.com");
+            //});
 
             app.UseMvc(config =>
             {
