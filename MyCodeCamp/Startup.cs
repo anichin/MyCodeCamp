@@ -1,13 +1,17 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyCodeCamp.Data;
+using MyCodeCamp.Data.Entities;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace MyCodeCamp
 {
@@ -40,6 +44,37 @@ namespace MyCodeCamp
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddAutoMapper();
 
+            services.AddIdentity<CampUser, IdentityRole>()
+                .AddEntityFrameworkStores<CampContext>();
+
+            services.Configure<IdentityOptions>(config =>
+                {
+                    config.Cookies.ApplicationCookie.Events =
+                    new CookieAuthenticationEvents()
+                    {
+                        OnRedirectToLogin = (ctx) =>
+                        {
+                            if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == 200)
+                            {
+                                ctx.Response.StatusCode = 401;
+                            }
+
+                            return Task.CompletedTask;
+                        },
+
+                        OnRedirectToAccessDenied = (ctx) =>
+                        {
+                            if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == 200)
+                            {
+                                ctx.Response.StatusCode = 403;
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
+                }
+            );
+
             services.AddCors(cfg =>
             {
                 cfg.AddPolicy("Wildermuth", bldr =>
@@ -60,11 +95,11 @@ namespace MyCodeCamp
             // Add framework services.
             services.AddMvc(opt =>
             {
-                if (!_env.IsProduction())
-                {
-                    opt.SslPort = 44388;
-                }
-                opt.Filters.Add(new RequireHttpsAttribute());
+                //if (!_env.IsProduction())
+                //{
+                //    opt.SslPort = 8089;
+                //}
+                //opt.Filters.Add(new RequireHttpsAttribute());
             }
             )
               .AddJsonOptions(opt =>
@@ -89,6 +124,8 @@ namespace MyCodeCamp
             //        .AllowAnyMethod()
             //        .WithOrigins("http://wildermuth.com");
             //});
+
+            app.UseIdentity();
 
             app.UseMvc(config =>
             {

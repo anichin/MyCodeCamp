@@ -9,9 +9,11 @@ using MyCodeCamp.Models;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Cors;
 using MyCodeCamp.Filters;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MyCodeCamp.Controllers
 {
+    [Authorize]
     [EnableCors("AnyGET")]
     [Route("api/[controller]")]
     [ValidateModel]
