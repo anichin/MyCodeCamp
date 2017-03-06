@@ -40,6 +40,7 @@ namespace MyCodeCamp
             services.AddDbContext<CampContext>(ServiceLifetime.Scoped);
             services.AddScoped<ICampRepository, CampRepository>();
             services.AddTransient<CampDbInitializer>();
+            services.AddTransient<CampIdentityInitializer>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddAutoMapper();
@@ -95,11 +96,11 @@ namespace MyCodeCamp
             // Add framework services.
             services.AddMvc(opt =>
             {
-                //if (!_env.IsProduction())
-                //{
-                //    opt.SslPort = 8089;
-                //}
-                //opt.Filters.Add(new RequireHttpsAttribute());
+                if (!_env.IsProduction())
+                {
+                    opt.SslPort = 44388;
+                }
+                opt.Filters.Add(new RequireHttpsAttribute());
             }
             )
               .AddJsonOptions(opt =>
@@ -113,7 +114,8 @@ namespace MyCodeCamp
         public void Configure(IApplicationBuilder app,
           IHostingEnvironment env,
           ILoggerFactory loggerFactory,
-          CampDbInitializer seeder)
+          CampDbInitializer seeder,
+          CampIdentityInitializer identitySeeder)
         {
             loggerFactory.AddConsole(_config.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -129,10 +131,11 @@ namespace MyCodeCamp
 
             app.UseMvc(config =>
             {
-          //config.MapRoute("MainAPIRoute", "api/{controller}/{action}");
-      });
+                //config.MapRoute("MainAPIRoute", "api/{controller}/{action}");
+            });
 
             seeder.Seed().Wait();
+            identitySeeder.Seed().Wait();
         }
     }
 }
