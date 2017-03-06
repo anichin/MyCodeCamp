@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using MyCodeCamp.Data;
@@ -23,19 +24,22 @@ namespace MyCodeCamp.Controllers
         private ILogger<AuthController> _logger;
         private UserManager<CampUser> _userMgr;
         private IPasswordHasher<CampUser> _hasher;
+        private IConfigurationRoot _config;
 
 
         public AuthController(CampContext context, 
             SignInManager<CampUser> signInMgr,
             UserManager<CampUser> userMgr,
             IPasswordHasher<CampUser> hasher,
-            ILogger<AuthController> logger)
+            ILogger<AuthController> logger,
+            IConfigurationRoot config)
         {
             _context = context;
             _signInMgr = signInMgr;
             _userMgr = userMgr;
             _hasher = hasher;
             _logger = logger;
+            _config = config;
         }
 
         [HttpPost("api/auth/login")]
@@ -76,12 +80,12 @@ namespace MyCodeCamp.Controllers
                             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         };
 
-                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("VERYLONGKEYVALUETHATISSECURE"));
+                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
                         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
                         var token = new JwtSecurityToken(
-                            issuer: "http://mycodecamp.org",
-                            audience: "http://mycodecamp.org",
+                            issuer: _config["Tokens:Issuer"],
+                            audience: _config["Tokens:Audience"],
                             claims: claims,
                             expires: DateTime.UtcNow.AddMinutes(15),
                             signingCredentials: credentials

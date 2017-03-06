@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,6 +13,7 @@ using MyCodeCamp.Data;
 using MyCodeCamp.Data.Entities;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
 
 namespace MyCodeCamp
 {
@@ -128,6 +130,20 @@ namespace MyCodeCamp
             //});
 
             app.UseIdentity();
+
+            app.UseJwtBearerAuthentication(new JwtBearerOptions()
+            {
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true,
+                TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidIssuer = _config["Tokens:Issuer"],
+                    ValidAudience = _config["Tokens:Audience"],
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"])),
+                    ValidateLifetime = true
+                }
+            });
 
             app.UseMvc(config =>
             {
