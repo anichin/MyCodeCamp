@@ -78,6 +78,13 @@ namespace MyCodeCamp
                 }
             );
 
+            services.AddApiVersioning(cfg =>
+            {
+                cfg.DefaultApiVersion = new ApiVersion(1, 1);
+                cfg.AssumeDefaultVersionWhenUnspecified = true;
+                cfg.ReportApiVersions = true;
+            });
+
             services.AddCors(cfg =>
             {
                 cfg.AddPolicy("Wildermuth", bldr =>

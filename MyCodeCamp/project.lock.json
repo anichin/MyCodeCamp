@@ -650,6 +650,19 @@
           "lib/netstandard1.6/Microsoft.AspNetCore.Mvc.TagHelpers.dll": {}
         }
       },
+      "Microsoft.AspNetCore.Mvc.Versioning/1.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Mvc": "1.0.0",
+          "NETStandard.Library": "1.6.0"
+        },
+        "compile": {
+          "lib/netstandard1.6/Microsoft.AspNetCore.Mvc.Versioning.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.6/Microsoft.AspNetCore.Mvc.Versioning.dll": {}
+        }
+      },
       "Microsoft.AspNetCore.Mvc.ViewFeatures/1.0.0": {
         "type": "package",
         "dependencies": {
@@ -4384,6 +4397,19 @@
         "lib/net451/Microsoft.AspNetCore.Mvc.TagHelpers.xml",
         "lib/netstandard1.6/Microsoft.AspNetCore.Mvc.TagHelpers.dll",
         "lib/netstandard1.6/Microsoft.AspNetCore.Mvc.TagHelpers.xml"
+      ]
+    },
+    "Microsoft.AspNetCore.Mvc.Versioning/1.0.0": {
+      "sha512": "LR/xVo+4+C58QI4zkIbLR9bQsUMwm+JAZm3fXLeGqyj7mutYWdbJXeaTomCIIFJX+0SI+rr3ETE51xId9MA7ZA==",
+      "type": "package",
+      "path": "Microsoft.AspNetCore.Mvc.Versioning/1.0.0",
+      "files": [
+        "Microsoft.AspNetCore.Mvc.Versioning.1.0.0.nupkg.sha512",
+        "Microsoft.AspNetCore.Mvc.Versioning.nuspec",
+        "lib/net451/Microsoft.AspNetCore.Mvc.Versioning.dll",
+        "lib/net451/Microsoft.AspNetCore.Mvc.Versioning.xml",
+        "lib/netstandard1.6/Microsoft.AspNetCore.Mvc.Versioning.dll",
+        "lib/netstandard1.6/Microsoft.AspNetCore.Mvc.Versioning.xml"
       ]
     },
     "Microsoft.AspNetCore.Mvc.ViewFeatures/1.0.0": {
@@ -10093,6 +10119,7 @@
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 1.0.0",
       "Microsoft.AspNetCore.Identity >= 1.0.0",
       "Microsoft.AspNetCore.Mvc >= 1.0.0",
+      "Microsoft.AspNetCore.Mvc.Versioning >= 1.0.0",
       "Microsoft.AspNetCore.Server.IISIntegration >= 1.0.0",
       "Microsoft.AspNetCore.Server.Kestrel >= 1.0.0",
       "Microsoft.Extensions.Configuration.EnvironmentVariables >= 1.0.0",
