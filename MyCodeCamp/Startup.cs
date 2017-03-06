@@ -13,7 +13,11 @@ using MyCodeCamp.Data;
 using MyCodeCamp.Data.Entities;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
 using Microsoft.IdentityModel.Tokens;
+using MyCodeCamp.Controllers;
+using MyCodeCamp.Models;
 
 namespace MyCodeCamp
 {
@@ -83,6 +87,14 @@ namespace MyCodeCamp
                 cfg.DefaultApiVersion = new ApiVersion(1, 1);
                 cfg.AssumeDefaultVersionWhenUnspecified = true;
                 cfg.ReportApiVersions = true;
+                cfg.ApiVersionReader = new HeaderApiVersionReader("ver", "X-MyCodeCamp-Version");
+
+                cfg.Conventions.Controller<TalksController>()
+                    .HasApiVersion(new ApiVersion(1, 0))
+                    .HasApiVersion(new ApiVersion(1, 1))
+                    .HasApiVersion(new ApiVersion(2, 0))
+                    .Action(m => m.Post(default(string), default(int), default(TalkModel)))
+                    .MapToApiVersion(new ApiVersion(2, 0));
             });
 
             services.AddCors(cfg =>
