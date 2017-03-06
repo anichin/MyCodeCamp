@@ -103,7 +103,7 @@ namespace MyCodeCamp.Controllers
             return BadRequest("Failed to save new talk");
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}", Name = "UpdateTalk")]
         public async Task<IActionResult> Put(string moniker, int speakerId, int id, [FromBody] TalkModel model)
         {
             try
