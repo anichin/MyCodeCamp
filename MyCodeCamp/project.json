@@ -1,4 +1,4 @@
-﻿{
+{
   "dependencies": {
     "Microsoft.NETCore.App": {
       "version": "1.0.0",
@@ -18,7 +18,8 @@
     "AutoMapper.Extensions.Microsoft.DependencyInjection": "1.2.0",
     "MyCodeCamp.Data": {
       "target": "project"
-    }
+    },
+    "System.IdentityModel.Tokens.Jwt": "5.0.0"
   },
 
   "tools": {
