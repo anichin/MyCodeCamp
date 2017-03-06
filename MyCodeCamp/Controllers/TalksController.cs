@@ -60,11 +60,17 @@ namespace MyCodeCamp.Controllers
 
             if (talk.Speaker.Id != speakerId || talk.Speaker.Camp.Moniker != moniker) return BadRequest("Invalid talk for the speaker selected");
 
+            AddETag(talk);
+
+            return Ok(_mapper.Map<TalkModel>(talk));
+        }
+
+        private void AddETag(Talk talk)
+        {
+
             var etag = Convert.ToBase64String(talk.RowVersion);
             Response.Headers.Add("ETag", etag);
             _cache.Set($"Talk-{talk.Id}-{etag}", talk);
-
-            return Ok(_mapper.Map<TalkModel>(talk));
         }
 
         [HttpPost()]
@@ -82,6 +88,7 @@ namespace MyCodeCamp.Controllers
 
                     if (await _repo.SaveAllAsync())
                     {
+                        AddETag(talk);
                         return Created(Url.Link("GetTalk", new { moniker = moniker, speakerId = speakerId, id = talk.Id }), _mapper.Map<TalkModel>(talk));
                     }
                 }
@@ -104,10 +111,21 @@ namespace MyCodeCamp.Controllers
                 var talk = _repo.GetTalk(id);
                 if (talk == null) return NotFound();
 
+                if (Request.Headers.ContainsKey("If-Match"))
+                {
+                    var etag = Request.Headers["If-Match"].First();
+
+                    if (etag != Convert.ToBase64String(talk.RowVersion))
+                    {
+                        return StatusCode((int) HttpStatusCode.PreconditionFailed);
+                    }
+                }
+
                 _mapper.Map(model, talk);
 
                 if (await _repo.SaveAllAsync())
                 {
+                    AddETag(talk);
                     return Ok(_mapper.Map<TalkModel>(talk));
                 }
 
@@ -128,6 +146,16 @@ namespace MyCodeCamp.Controllers
             {
                 var talk = _repo.GetTalk(id);
                 if (talk == null) return NotFound();
+
+                if (Request.Headers.ContainsKey("If-Match"))
+                {
+                    var etag = Request.Headers["If-Match"].First();
+
+                    if (etag != Convert.ToBase64String(talk.RowVersion))
+                    {
+                        return StatusCode((int)HttpStatusCode.PreconditionFailed);
+                    }
+                }
 
                 _repo.Delete(talk);
 
